@@ -1,12 +1,16 @@
 package views;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 import java.util.Scanner;
 
 import controllers.Controller;
 import model.Toy;
 
 public class ViewToy {
-    
+
+    Toy toy;
     private Controller controller;
 
     public ViewToy(Controller controller) {
@@ -14,17 +18,18 @@ public class ViewToy {
     }
 
     public void run() {
+        Queue<Toy> prizes = new LinkedList<>();
         Commands com = Commands.NONE;
 
         while (true) {
             String command = prompt("Введите команду:\n" +
                                 "LIST - просмотр игрушек для розыгрыша\n" +
                                 "CREATE - добавление новой игрушки\n" +
-                               "UPDATE - изменение частоты выпадания\n" +
-                               "DELETE - удаление игрушки\n" +
-                               "PUT - розыгрыш призов\n" +
-                               "GET - выдача приза\n" +
-                               "EXIT - выход");
+                                "UPDATE - изменение частоты выпадания\n" +
+                                "DELETE - удаление игрушки\n" +
+                                "PUT - розыгрыш призов\n" +
+                                "GET - выдача приза\n" +
+                                "EXIT - выход\n");
             try {
                 com = Commands.valueOf(command);
             }
@@ -37,29 +42,30 @@ public class ViewToy {
                 switch (com) {
 
                     case CREATE:
-                        User user = setUser(false);
-                        userController.saveUser(user);
+                        Toy toy = setToy(false);
+                        controller.saveToy(toy);
                         break;
                     case LIST:
-                        List<User> userList = userController.readUserList();
-                        for (User item : userList) {
+                        List<Toy> toyList = controller.readToyList();
+                        for (Toy item : toyList) {
                             System.out.println(item);
                             System.out.println();
                         }
                         break;
                     case UPDATE:
-                        User updateUser = setUser(true);
-                        userController.updateUser(updateUser);
+                        // String updateId = prompt("Идентификатор игрушки: ");
+                        Toy updateToy = setToy(true);
+                        controller.updateToy(updateToy);
                         break;
                     case DELETE:
-                        String deleteId = prompt("Идентификатор пользователя: ");
-                        userController.deleteUser(deleteId);
+                        String deleteId = prompt("Идентификатор игрушки: ");
+                        controller.deleteToy(deleteId);
                         break;
                     case PUT:
-
+                        prizes = controller.putToy();
                     break;
                     case GET:
-
+                        controller.getToy(prizes);
                     break;
                 }
             } catch (Exception e) {
@@ -74,7 +80,7 @@ public class ViewToy {
         return in.nextLine();
     }
 
-    private Toy setUser(boolean forUpdate) {
+    private Toy setToy(boolean forUpdate) {
         String idString = null;
         if (forUpdate) {
             idString = prompt("Идентификатор игрушки: ");
